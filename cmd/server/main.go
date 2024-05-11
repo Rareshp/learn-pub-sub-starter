@@ -3,22 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-  "os"
 	amqp "github.com/rabbitmq/amqp091-go"
   "github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
   "github.com/bootdotdev/learn-pub-sub-starter/internal/routing"
 )
 
 const connectionString = "amqp://guest:guest@localhost:5672/"
-
-func cleanup() {
-  fmt.Println("\nShutting down")
-}
-
-func ctrlC() {
-  cleanup()
-  os.Exit(1)
-}
 
 func main() {
 	fmt.Println("Starting Peril server...")
@@ -52,5 +42,5 @@ func main() {
   if err != nil {
     log.Printf("could not publish message: %v", err)
   }
-  fmt.Println("Puase message sent")
+  fmt.Println("Pause message sent")
 }
