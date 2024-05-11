@@ -1,7 +1,6 @@
 package pubsub
 
 import (
-  "fmt"
 	"context"
 	"encoding/json"
 
@@ -9,8 +8,6 @@ import (
 )
 
 func PublishJSON[T any](ch *amqp.Channel, exchange, key string, val T) error {
-
-  fmt.Println("Printing message...", val)
 
   m, err := json.Marshal(val)
   if err != nil { 
