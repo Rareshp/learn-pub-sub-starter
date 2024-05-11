@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
   "os"
-  "os/signal"
-  "syscall"
 	amqp "github.com/rabbitmq/amqp091-go"
+  "github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
+  "github.com/bootdotdev/learn-pub-sub-starter/internal/routing"
 )
 
 const connectionString = "amqp://guest:guest@localhost:5672/"
@@ -34,9 +34,23 @@ func main() {
 
   fmt.Println("Connection to RabbitMQ was successful")
 
-  // handle Ctrl+C to quit 
-  signalChan := make(chan os.Signal, 1) // the int is for buffering
-  signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-  <-signalChan
-  ctrlC()
+  publishChannel, err := connection.Channel()
+  if err != nil {
+    log.Fatalf("could not creat channel: %v", err)
+  } 
+
+  fmt.Println("About to publish JSON...")
+
+  err = pubsub.PublishJSON(
+    publishChannel, 
+    routing.ExchangePerilDirect,
+    routing.PauseKey,
+    routing.PlayingState{
+      IsPaused: true,
+    },
+  )
+  if err != nil {
+    log.Printf("could not publish message: %v", err)
+  }
+  fmt.Println("Puase message sent")
 }
