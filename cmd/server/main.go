@@ -43,6 +43,7 @@ func main() {
       case "resume":
         message(publishChannel, false)
       case "quit":
+        gamelogic.PrintQuit()
         exit = 1
       default:
         fmt.Printf("did not understand command")
