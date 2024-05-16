@@ -48,6 +48,36 @@ func main() {
     log.Fatalf("could not create channel or q, %v:", err)
   }
 
+  gameState := gamelogic.NewGameState(userName)
+
+  exit := 0 
+  for exit == 0 {
+    userInput := gamelogic.GetInput()
+    switch userInput[0] {
+      case "": 
+        continue
+      case "spawn":
+        // spawn europe infantry
+        gameState.CommandSpawn(userInput)
+      case "move":
+        // move europe 1
+        gameState.CommandMove(userInput)
+      case "status":
+        gameState.CommandStatus()
+      case "spam":
+        fmt.Println("Spamming not allowed yet!")
+      case "help":
+        gamelogic.PrintServerHelp()
+      case "quit":
+        gamelogic.PrintQuit()
+        exit = 1
+      default:
+        fmt.Println("did not understand command")
+        gamelogic.PrintServerHelp()
+        continue
+    }
+  }
+
   log.Println(publishChannel, q)
 
   // handle Ctrl+C to quit
