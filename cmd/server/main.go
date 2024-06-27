@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	amqp "github.com/rabbitmq/amqp091-go"
-  "github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
+	"github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
   "github.com/bootdotdev/learn-pub-sub-starter/internal/routing"
   "github.com/bootdotdev/learn-pub-sub-starter/internal/gamelogic"
 )
@@ -27,10 +27,22 @@ func main() {
 
   publishChannel, err := connection.Channel()
   if err != nil {
-    log.Fatalf("could not creat channel: %v", err)
+    log.Fatalf("could not create channel: %v", err)
   } 
 
   gamelogic.PrintServerHelp()
+
+  gameLogsChannel, q, err := pubsub.DeclareAndBind(
+    connection,
+    routing.ExchangePerilTopic,
+    routing.ExchangeGameLogQName,
+    routing.ExchangeGameLogSlug,
+    1, // durable
+  )
+  if err != nil {
+    log.Fatalf("could not create channel or q, %v:", err)
+  }
+  log.Println(gameLogsChannel, q)
 
   exit := 0 
   for exit == 0 {

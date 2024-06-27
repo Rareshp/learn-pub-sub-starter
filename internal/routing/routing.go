@@ -13,4 +13,6 @@ const (
 const (
 	ExchangePerilDirect = "peril_direct"
 	ExchangePerilTopic  = "peril_topic"
+  ExchangeGameLogQName= "game_logs"
+  ExchangeGameLogSlug = "game_logs.*"
 )
