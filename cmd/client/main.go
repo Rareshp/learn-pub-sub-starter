@@ -53,7 +53,7 @@ func main() {
   err = pubsub.SubscribeJSON(
     connection, 
     routing.ExchangePerilDirect,
-    fmt.Sprintf("pause.%v", userName), // queue
+    routing.PauseKey + "." + gameState.GetUsername(),
     routing.PauseKey,
     2, //transient
     handlerPause(gameState),
@@ -62,6 +62,19 @@ func main() {
   if err != nil {
 		log.Fatalf("could not subscribe to pause: %v", err)
 	}
+
+  err = pubsub.SubscribeJSON(
+    connection,
+    routing.ExchangePerilTopic,
+    routing.ArmyMovesPrefix + "." + gameState.GetUsername(),
+		routing.ArmyMovesPrefix + ".*",
+    2, // transient
+    handlerMove(gameState),
+  )
+
+  if err != nil {
+    log.Fatalf("could not subscribe to any moves: %v", err)
+  }
 
   exit := 0 
   for exit == 0 {
@@ -74,7 +87,21 @@ func main() {
         gameState.CommandSpawn(userInput)
       case "move":
         // move europe 1
-        gameState.CommandMove(userInput)
+        mv, err := gameState.CommandMove(userInput)
+        if err != nil {
+          fmt.Println(err)
+          continue
+        }
+        err = pubsub.PublishJSON(
+          publishChannel,
+          routing.ExchangePerilTopic,
+          routing.ArmyMovesPrefix + "." + mv.Player.Username,
+          mv,
+        )
+        if err != nil {
+          fmt.Println(err)
+        }
+        fmt.Printf("Moved %v units to %s\n", len(mv.Units), mv.ToLocation)
       case "status":
         gameState.CommandStatus()
       case "spam":
