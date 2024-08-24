@@ -51,9 +51,31 @@ func main() {
       case "": 
         continue
       case "pause":
-        message(publishChannel, true)
+        fmt.Println("Publishing paused game state")
+        err = pubsub.PublishJSON(
+          publishChannel,
+          routing.ExchangePerilDirect,
+          routing.PauseKey,
+          routing.PlayingState{
+            IsPaused: true,
+          },
+        )
+        if err != nil {
+          log.Printf("could not publish time: %v", err)
+        }
       case "resume":
-        message(publishChannel, false)
+        fmt.Println("Publishing resumes game state")
+        err = pubsub.PublishJSON(
+          publishChannel,
+          routing.ExchangePerilDirect,
+          routing.PauseKey,
+          routing.PlayingState{
+            IsPaused: false,
+          },
+        )
+        if err != nil {
+          log.Printf("could not publish time: %v", err)
+        }
       case "quit":
         gamelogic.PrintQuit()
         exit = 1

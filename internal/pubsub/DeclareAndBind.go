@@ -29,13 +29,17 @@ func DeclareAndBind(
     exclusive = false
   }
 
+  args := amqp.Table{
+    "x-dead-letter-exchange": "peril_dlx",
+  }
+
   q, err := publishChannel.QueueDeclare(
     queueName,
     durable, 
     exclusive, 
     autoDelete,
     false, // no wait
-    nil,   // args
+    args,   // args
   )
   if err != nil {
     log.Fatalf("could not create Queue: %v", err)
